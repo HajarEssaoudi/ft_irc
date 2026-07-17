@@ -1,4 +1,5 @@
 #include "../includes/Server.hpp"
+#include "../includes/utils.hpp"
 
 Server::Server(int port , const std::string &password): _port(port), _password(password), _server_fd(-1){}
 
@@ -61,6 +62,7 @@ void Server::removePollFd(int fd)
     }
 }
 
+//the socket that listen to the port and accept the incoming connexions
 void Server::setUpSocket()
 {
     _server_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -127,7 +129,7 @@ void Server::start()
         size_t size = _fds.size();
         for(size_t i = 0; i < size; i++)
         {
-            if(_fds[i].revents & POLLIN)
+            if(_fds[i].revents & POLLIN) //is there a new event? is it new data not error
             {
                 if(_fds[i].fd == _server_fd)
                     accepterNewClient();
@@ -136,12 +138,11 @@ void Server::start()
             }
         }
     }
-
 }
 
 void Server::readClientData(int fd)
 {
-    char buf[512];
+    char buf[5012];
     memset(buf, 0, sizeof(buf));
     int bytes = recv(fd, buf, sizeof(buf) -1, 0);
     if(bytes <=0)
@@ -155,7 +156,7 @@ void Server::readClientData(int fd)
     }
     _clients[fd]->buffer += std::string(buf, bytes);
     size_t pos;
-    while((pos = _clients[fd]->buffer.find("\r\n")) != std::string::npos)
+    while((pos = _clients[fd]->buffer.find("\r\n")) != std::string::npos) //
     {
         std::string msg = _clients[fd]->buffer.substr(0, pos);
         _clients[fd]->buffer.erase(0, pos + 2);
@@ -163,15 +164,20 @@ void Server::readClientData(int fd)
             processMessage(fd, msg);
     }
 }
+
 void Server:: processMessage(int fd, const std::string& msg)
 {
-    std::cout << "msg received fd=" << fd << " : [" << msg << "]" << std::endl;
+    Message m = parseLine(msg); //done
+    if(m.command.empty())
+        return;
 
-    //parsing
+    /*to be modified*/
+    std::cout << "fd=" << fd << " cmd=[" << m.command << "] params=" << m.params.size() << std::endl;
 
     if (_clients.find(fd) != _clients.end())
-        _clients[fd]->sendMessage(":server notice * :Msg reçu : " + msg);
+        _clients[fd]->sendMessage(":server NOTICE * :received " + m.command);
 }
+
 void Server::removeClient(int fd)
 {
     if(_clients.find(fd) == _clients.end())

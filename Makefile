@@ -1,10 +1,11 @@
 SRC = src/main.cpp \
       src/Server.cpp \
-      src/Client.cpp
+      src/Client.cpp \
+	  src/utils.cpp
 
 CC = c++
 
-FLAGS = -Wall -Wextra -Werror -std=c++98
+FLAGS = -Wall -Wextra -Werror -std=c++98 -g
 
 NAME = ircserv
 

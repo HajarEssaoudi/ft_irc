@@ -12,6 +12,7 @@
 #include <netinet/in.h>
 #include <stdexcept>
 #include "Client.hpp"
+#include "utils.hpp"
 
 class Channel;
 
