@@ -12,6 +12,8 @@
 #include <netinet/in.h>
 #include <stdexcept>
 #include "Client.hpp"
+#include <cstdlib>
+#include <signal.h>
 #include "Channel.hpp"
 
 class Channel;
@@ -27,6 +29,8 @@ class Server
         std::map<std::string, Channel*> _channels;
 
     public:
+        static Server* instance;
+        static void signalHandler(int signal);
         Server(int port , const std::string &password);
         ~Server();
         void start();

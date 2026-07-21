@@ -1,5 +1,7 @@
 #include "../includes/Server.hpp"
 
+Server *Server::instance = NULL;
+
 Server::Server(int port , const std::string &password): _port(port), _password(password), _server_fd(-1){}
 
 
@@ -117,6 +119,9 @@ void Server::accepterNewClient()
 
 void Server::start()
 {
+    instance = this;
+    signal(SIGINT, signalHandler);
+    signal(SIGQUIT, signalHandler);
     setUpSocket();
     std::cout<<"the server has been launched"<<_port <<std::endl;
     std::cout<<"waiting..."<<std::endl;
@@ -218,4 +223,12 @@ void Server::removeChannel(const std::string &name)
 
     delete it->second;
     _channels.erase(it);
+}
+
+void Server::signalHandler(int signal)
+{
+    std::cout<<"\nSignal "<<signal<<" Server shutting down..."<<std::endl;
+    // if(instance != NULL)
+    //     delete instance;
+    return;
 }
