@@ -7,6 +7,10 @@ Server::~Server()
 {
     for(std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
         delete it->second;
+    std::map<std::string, Channel*>::iterator it;
+
+    for (it = _channels.begin(); it != _channels.end(); ++it)
+        delete it->second;
     _channels.clear();
 
     if(_server_fd != -1)
@@ -20,7 +24,7 @@ std::map<int, Client*>& Server::getClients()
     return(_clients);
 }
 
-std::vector<Channel *>& Server::getChannels()
+std::map<std::string, Channel*>& Server::getChannels()
 {
     return(_channels);
 }
@@ -180,4 +184,38 @@ void Server::removeClient(int fd)
     delete _clients[fd];
     _clients.erase(fd);
     removePollFd(fd);
+}
+
+Channel* Server::getChannel(const std::string &name)
+{
+    std::map<std::string, Channel*>::iterator it = _channels.find(name);
+
+    if (it == _channels.end())
+        return (NULL);
+
+    return (it->second);
+}
+
+Channel* Server::createChannel(const std::string &name)
+{
+    Channel *channel = getChannel(name);
+
+    if (channel)
+        return (channel);
+
+    channel = new Channel(name);
+    _channels[name] = channel;
+
+    return (channel);
+}
+
+void Server::removeChannel(const std::string &name)
+{
+    std::map<std::string, Channel*>::iterator it = _channels.find(name);
+
+    if (it == _channels.end())
+        return;
+
+    delete it->second;
+    _channels.erase(it);
 }

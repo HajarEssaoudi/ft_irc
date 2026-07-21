@@ -12,6 +12,7 @@
 #include <netinet/in.h>
 #include <stdexcept>
 #include "Client.hpp"
+#include "Channel.hpp"
 
 class Channel;
 
@@ -23,16 +24,22 @@ class Server
         int _server_fd;
         std::vector<struct pollfd> _fds;
         std::map<int, Client*> _clients;
-        std::vector<Channel*>_channels;
+        std::map<std::string, Channel*> _channels;
+
     public:
         Server(int port , const std::string &password);
         ~Server();
         void start();
         const std::string& getPassword() const;
         std::map<int, Client*>& getClients();
-        std::vector<Channel*>& getChannels();
+        std::map<std::string, Channel*>& getChannels();
         Client* getClientByNick(const std::string &nick);
         void removeClient(int fd);
+
+        // Added to manipulate channels
+        Channel* getChannel(const std::string &name);
+        Channel* createChannel(const std::string &name);
+        void removeChannel(const std::string &name);
 
 
     private:
