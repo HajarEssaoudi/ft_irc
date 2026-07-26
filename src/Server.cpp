@@ -184,8 +184,6 @@ void Server::readClientData(int fd)
 
 void Server::processMessage(int fd, const std::string &msg)
 {
-    std::cout << "msg received fd=" << fd << " : [" << msg << "]" << std::endl;
-
     std::map<int, Client*>::iterator it = _clients.find(fd);
     if (it == _clients.end())
         return;
@@ -196,7 +194,14 @@ void Server::processMessage(int fd, const std::string &msg)
     if (message.command.empty())
         return;
 
-    if (message.command == "JOIN")
+    if (message.command == "PASS")
+        executePass(message, fd);
+    else if (message.command == "NICK")
+        executeNick(message, fd);
+    else if (message.command == "USER")
+        executeUser(message, fd);
+
+    else if (message.command == "JOIN")
         joinCommand(client, message);
     else if (message.command == "PART")
         partCommand(client, message);
@@ -209,7 +214,7 @@ void Server::processMessage(int fd, const std::string &msg)
     else if (message.command == "MODE")
         modeCommand(client, message);
     else
-        client->sendMessage("421 " + message.command + " :Unknown command\r\n");
+        raiseError(fd, ERR_UNKNOWNCOMMAND, message.command);
 }
 
 void Server::removeClient(int fd)
