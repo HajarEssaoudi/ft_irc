@@ -12,7 +12,7 @@
 #include <netinet/in.h>
 #include <stdexcept>
 #include "Client.hpp"
-#include "utils.hpp"
+#include "parsing.hpp"
 
 class Channel;
 
@@ -34,14 +34,23 @@ class Server
         std::vector<Channel*>& getChannels();
         Client* getClientByNick(const std::string &nick);
         void removeClient(int fd);
-
-
-    private:
+        void raiseError(int fd, int code, const std::string &arg); //added
+        
+        
+        
+        public: //to be changed after tests
         void setUpSocket();
         void accepterNewClient();
         void readClientData(int fd);
         void processMessage(int fd, const std::string& msg);
         void addPollFd(int fd);
         void removePollFd(int fd);
+        void tryAuthenticate(int fd);
+        /*cmds*/
+        void    executePass(Message msg, int fd);
+        void    executeNick(Message msg, int fd);
+        void    executeUser(Message msg, int fd);
+
+        void    execCmd(const Message &msg, int fd);
 };
 #endif

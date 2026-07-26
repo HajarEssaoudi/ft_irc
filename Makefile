@@ -1,7 +1,9 @@
 SRC = src/main.cpp \
       src/Server.cpp \
       src/Client.cpp \
-	  src/utils.cpp
+      src/parsing.cpp \
+	  src/utils.cpp \
+	  src/AuthCmd.cpp
 
 CC = c++
 

@@ -1,5 +1,4 @@
 #include "../includes/Server.hpp"
-#include "../includes/utils.hpp"
 
 Server::Server(int port , const std::string &password): _port(port), _password(password), _server_fd(-1){}
 
@@ -165,17 +164,34 @@ void Server::readClientData(int fd)
     }
 }
 
-void Server:: processMessage(int fd, const std::string& msg)
+void Server::processMessage(int fd, const std::string& msg)
 {
-    Message m = parseLine(msg); //done
-    if(m.command.empty())
+    Message m = parseLine(msg);
+
+    if (m.command.empty())
+    {
+        raiseError(fd, ERR_UNKNOWNCOMMAND, "");
         return;
+    }
 
-    /*to be modified*/
-    std::cout << "fd=" << fd << " cmd=[" << m.command << "] params=" << m.params.size() << std::endl;
+    if (!isValidCmd(m.command))
+    {
+        raiseError(fd, ERR_UNKNOWNCOMMAND, m.command);
+        return;
+    }
 
-    if (_clients.find(fd) != _clients.end())
-        _clients[fd]->sendMessage(":server NOTICE * :received " + m.command);
+    if (!hasEnoughParams(m))
+    {
+        raiseError(fd, ERR_NEEDMOREPARAMS, m.command);
+        return;
+    }
+
+    std::cout << "fd=" << fd
+              << " cmd=[" << m.command << "]"
+              << " params=" << m.params.size() << " " << m.params[0] 
+              << std::endl;
+
+    execCmd(m, fd);
 }
 
 void Server::removeClient(int fd)
@@ -187,3 +203,4 @@ void Server::removeClient(int fd)
     _clients.erase(fd);
     removePollFd(fd);
 }
+

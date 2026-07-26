@@ -2,6 +2,12 @@
 #include "../includes/Server.hpp"
 #include <cstdlib>
 #include <stdexcept>
+#include "../includes/parsing.hpp"
+
+#include "../includes/Server.hpp"
+#include "../includes/Client.hpp"
+#include <iostream>
+
 int main(int argc, char** argv)
 {
     if (argc != 3)

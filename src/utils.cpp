@@ -1,80 +1,96 @@
-#include "../includes/utils.hpp"
+#include "../includes/parsing.hpp"
+#include "../includes/Server.hpp"
 
-void parsePrefix(Message &msg, std::string &line)
+bool    isValidCmd(std::string cmd)
 {
-    if (!line.empty() && line[0] == ':')
+    if (cmd == "PASS"  || cmd == "NICK"   || cmd == "USER"   || 
+        cmd == "JOIN"  || cmd == "PRIVMSG"|| cmd == "KICK"   || 
+        cmd == "MODE"  || cmd == "INVITE" || cmd == "TOPIC")
     {
-        size_t pos = line.find(' ');
-
-        if (pos == std::string::npos)
-        {
-            msg.prefix = line.substr(1);
-            line.clear();
-            return;
-        }
-
-        msg.prefix = line.substr(1, pos - 1);
-        line = line.substr(pos + 1);
+        return true;
     }
+    return false;
 }
 
-void parseCmd(Message &msg, std::string &line)
+bool hasEnoughParams(const Message &msg)
 {
-    while (!line.empty() && line[0] == ' ')
-        line.erase(0, 1);
+    if (msg.command == "PASS")
+        return msg.params.size() >= 1;
 
-    size_t pos = line.find(' ');
+    if (msg.command == "NICK")
+        return msg.params.size() >= 1;
 
-    msg.command = line.substr(0, pos);
+    if (msg.command == "USER")
+        return msg.params.size() >= 3 && !msg.trailing.empty();
 
-    if (pos == std::string::npos)
-        line.clear();
+    if (msg.command == "JOIN")
+        return msg.params.size() >= 1;
+
+    if (msg.command == "PRIVMSG")
+        return msg.params.size() >= 1 && !msg.trailing.empty();
+
+    if (msg.command == "KICK")
+        return msg.params.size() >= 2;
+
+    if (msg.command == "INVITE")
+        return msg.params.size() >= 2;
+
+    if (msg.command == "TOPIC")
+        return msg.params.size() >= 1;
+
+    if (msg.command == "MODE")
+        return msg.params.size() >= 2;
+
+    return true;
+}
+
+std::string toString(int value)
+{
+    std::ostringstream oss;
+    oss << value;
+    return oss.str();
+}
+
+void Server::raiseError(int fd, int code, const std::string &arg)
+{
+    Client *client = _clients[fd];
+
+    std::string msg = ":ircserv " + toString(code) + " ";
+
+    if (client->nickname.empty() || client->nickname == "*")
+        msg += "* ";
     else
-        line = line.substr(pos + 1);
-}
+        msg += client->nickname + " ";
 
-void parseParameters(Message &msg, std::string &line)
-{
-    while (!line.empty())
+    switch (code)
     {
-        while (!line.empty() && line[0] == ' ')
-            line.erase(0, 1);
+        case ERR_UNKNOWNCOMMAND:
+            msg += arg + " :Unknown command";
+            break;
 
-        if (line.empty() || line[0] == ':')
+        case ERR_NEEDMOREPARAMS:
+            msg += arg + " :Not enough parameters";
+            break;
+
+        case ERR_NONICKNAMEGIVEN:
+            msg += ":No nickname given";
+            break;
+
+        case ERR_NICKNAMEINUSE:
+            msg += arg + " :Nickname is already in use";
+            break;
+
+        case ERR_ALREADYREGISTERED:
+            msg += ":You may not reregister";
+            break;
+
+        case ERR_PASSWDMISMATCH:
+            msg += ":Password incorrect";
+            break;
+
+        default:
             return;
-
-        size_t pos = line.find(' ');
-
-        if (pos == std::string::npos)
-        {
-            msg.params.push_back(line);
-            line.clear();
-            return;
-        }
-
-        msg.params.push_back(line.substr(0, pos));
-        line = line.substr(pos + 1);
     }
-}
 
-void parseTrailing(Message &msg, std::string &line)
-{
-    while (!line.empty() && line[0] == ' ')
-        line.erase(0, 1);
-
-    if (!line.empty() && line[0] == ':')
-        msg.trailing = line.substr(1);
-}
-
-Message parseLine(const std::string &rawline)
-{
-    Message msg;
-    std::string line = rawline;
-
-    parsePrefix(msg, line);
-    parseCmd(msg, line);
-    parseParameters(msg, line);
-    parseTrailing(msg, line);
-
-    return msg;
+    client->sendMessage(msg);
 }
