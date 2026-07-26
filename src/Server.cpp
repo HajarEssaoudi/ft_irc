@@ -172,15 +172,46 @@ void Server::readClientData(int fd)
             processMessage(fd, msg);
     }
 }
-void Server:: processMessage(int fd, const std::string& msg)
+// void Server:: processMessage(int fd, const std::string& msg)
+// {
+//     std::cout << "msg received fd=" << fd << " : [" << msg << "]" << std::endl;
+
+//     //parsing
+
+//     if (_clients.find(fd) != _clients.end())
+//         _clients[fd]->sendMessage(":server notice * :Msg reçu : " + msg);
+// }
+
+void Server::processMessage(int fd, const std::string &msg)
 {
     std::cout << "msg received fd=" << fd << " : [" << msg << "]" << std::endl;
 
-    //parsing
+    std::map<int, Client*>::iterator it = _clients.find(fd);
+    if (it == _clients.end())
+        return;
 
-    if (_clients.find(fd) != _clients.end())
-        _clients[fd]->sendMessage(":server notice * :Msg reçu : " + msg);
+    Client *client = it->second;
+    Message message = parseLine(msg);
+
+    if (message.command.empty())
+        return;
+
+    if (message.command == "JOIN")
+        joinCommand(client, message);
+    else if (message.command == "PART")
+        partCommand(client, message);
+    else if (message.command == "TOPIC")
+        topicCommand(client, message);
+    else if (message.command == "INVITE")
+        inviteCommand(client, message);
+    else if (message.command == "KICK")
+        kickCommand(client, message);
+    else if (message.command == "MODE")
+        modeCommand(client, message);
+    else
+        client->sendMessage("421 " + message.command + " :Unknown command\r\n");
 }
+
 void Server::removeClient(int fd)
 {
     if(_clients.find(fd) == _clients.end())

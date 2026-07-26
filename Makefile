@@ -1,6 +1,6 @@
 SRC = src/main.cpp \
       src/Server.cpp \
-      src/Client.cpp src/Channel.cpp
+      src/Client.cpp src/Channel.cpp src/ChannelCommands.cpp src/utils.cpp \
 
 CC = c++
 

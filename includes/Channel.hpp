@@ -74,6 +74,7 @@ class Channel
         // Utility
         size_t getMemberCount() const;
         bool empty() const;
+        void broadcast(const std::string &message);
 };
 
 #endif

@@ -15,6 +15,7 @@
 #include <cstdlib>
 #include <signal.h>
 #include "Channel.hpp"
+#include "utils.hpp"
 
 class Channel;
 
@@ -45,6 +46,13 @@ class Server
         Channel* createChannel(const std::string &name);
         void removeChannel(const std::string &name);
 
+        // Channel commands
+        void joinCommand(Client *client, const Message &msg);
+        void partCommand(Client *client, const Message &msg);
+        void topicCommand(Client *client, const Message &msg);
+        void inviteCommand(Client *client, const Message &msg);
+        void kickCommand(Client *client, const Message &msg);
+        void modeCommand(Client *client, const Message &msg);
 
     private:
         void setUpSocket();
@@ -53,5 +61,12 @@ class Server
         void processMessage(int fd, const std::string& msg);
         void addPollFd(int fd);
         void removePollFd(int fd);
+
+        // Helper functions for channel commands
+        Channel* requireChannel(Client *client, const std::string &name);
+        bool requireMember(Client *client, Channel *channel);
+        bool requireOperator(Client *client, Channel *channel);
+        Client* requireClient(Client *requester,
+                            const std::string &nickname);
 };
 #endif

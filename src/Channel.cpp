@@ -7,8 +7,7 @@ Channel::Channel(const std::string &name)
       _userLimit(0),
       _inviteOnly(false),
       _topicRestricted(false)
-{
-}
+{}
 
 Channel::Channel(const Channel &other)
 {
@@ -34,8 +33,7 @@ Channel &Channel::operator=(const Channel &other)
 }
 
 Channel::~Channel()
-{
-}
+{}
 
 const std::string &Channel::getName() const
 {
@@ -190,4 +188,11 @@ bool Channel::empty() const
     return (_members.empty());
 }
 
+void Channel::broadcast(const std::string &message)
+{
+    std::set<Client *>::iterator it;
+
+    for (it = _members.begin(); it != _members.end(); ++it)
+        (*it)->sendMessage(message);
+}
 
