@@ -193,28 +193,7 @@ void Server::processMessage(int fd, const std::string &msg)
 
     if (message.command.empty())
         return;
-
-    // if (message.command == "PASS")
-    //     executePass(client, message);
-    // else if (message.command == "NICK")
-    //     executeNick(clientmessage);
-    // else if (message.command == "USER")
-    //     executeUser(message);
-
-    // else if (message.command == "JOIN")
-    //     joinCommand(client, message);
-    // else if (message.command == "PART")
-    //     partCommand(client, message);
-    // else if (message.command == "TOPIC")
-    //     topicCommand(client, message);
-    // else if (message.command == "INVITE")
-    //     inviteCommand(client, message);
-    // else if (message.command == "KICK")
-    //     kickCommand(client, message);
-    // else if (message.command == "MODE")
-    //     modeCommand(client, message);
-
-    if (isValidCmd(message.command))
+    if (isValidCmd(message))
         execCmd(client , message);
     else
         raiseError(fd, ERR_UNKNOWNCOMMAND, message.command);

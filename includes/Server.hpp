@@ -50,6 +50,7 @@ class Server
         Channel* createChannel(const std::string &name);
         void     removeChannel(const std::string &name);
 
+        bool isValidCmd(Message& msg);
         void passCommand(Client *client, const Message &msg);
         void nickCommand(Client *client, const Message &msg);
         void userCommand(Client *client, const Message &msg);
@@ -59,6 +60,7 @@ class Server
         void inviteCommand(Client *client, const Message &msg);
         void kickCommand(Client *client, const Message &msg);
         void modeCommand(Client *client, const Message &msg);
+        void privmsgCommand(Client *client, const Message &msg);
 
         void tryAuthenticate(int fd);
         void raiseError(int fd, int code, const std::string &arg);

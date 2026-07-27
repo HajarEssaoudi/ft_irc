@@ -1,10 +1,20 @@
-SRC = src/main.cpp \
-      src/Server.cpp \
-      src/Client.cpp\
-	  src/Channel.cpp\
-	  src/ChannelCommands.cpp\
-	  src/utils.cpp\
-	  src/AuthCmd.cpp
+SRC =	src/main.cpp \
+		src/Server.cpp \
+		src/Client.cpp \
+		src/Channel.cpp \
+		src/utils.cpp \
+		src/cmds/execCmd.cpp \
+		src/cmds/helpers.cpp \
+		src/cmds/invite.cpp \
+		src/cmds/join.cpp \
+		src/cmds/kick.cpp \
+		src/cmds/mode.cpp \
+		src/cmds/nick.cpp \
+		src/cmds/part.cpp \
+		src/cmds/pass.cpp \
+		src/cmds/privmsg.cpp \
+		src/cmds/topic.cpp \
+		src/cmds/user.cpp
 
 CC = c++
 

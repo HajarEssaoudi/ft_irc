@@ -14,6 +14,9 @@
 #define ERR_NOTREGISTERED     451
 #define ERR_ALREADYREGISTERED 462
 #define ERR_PASSWDMISMATCH    464
+#define ERR_NORECIPIENT       411
+#define ERR_NOTEXTTOSEND      412
+#define ERR_NOSUCHNICK        401
 
 // ── La struct Message ─────────────────────────────
 typedef struct s_msg
