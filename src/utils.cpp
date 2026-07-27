@@ -137,6 +137,7 @@ void Server::raiseError(int fd, int code, const std::string &arg)
         case ERR_NICKNAMEINUSE:     msg += arg + " :Nickname is already in use"; break;
         case ERR_ALREADYREGISTERED: msg += ":You may not reregister";        break;
         case ERR_PASSWDMISMATCH:    msg += ":Password incorrect";            break;
+        case ERR_NOTREGISTERED:    msg += ":You have not registered";            break;
         default: return;
     }
     client->sendMessage(msg);

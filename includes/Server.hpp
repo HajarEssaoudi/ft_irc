@@ -50,6 +50,9 @@ class Server
         Channel* createChannel(const std::string &name);
         void     removeChannel(const std::string &name);
 
+        void passCommand(Client *client, const Message &msg);
+        void nickCommand(Client *client, const Message &msg);
+        void userCommand(Client *client, const Message &msg);
         void joinCommand(Client *client, const Message &msg);
         void partCommand(Client *client, const Message &msg);
         void topicCommand(Client *client, const Message &msg);
@@ -58,10 +61,8 @@ class Server
         void modeCommand(Client *client, const Message &msg);
 
         void tryAuthenticate(int fd);
-        void executePass(Message msg, int fd);
-        void executeNick(Message msg, int fd);
-        void executeUser(Message msg, int fd);
         void raiseError(int fd, int code, const std::string &arg);
+        void execCmd(Client *client , Message &msg);
 
     private:
         void setUpSocket();

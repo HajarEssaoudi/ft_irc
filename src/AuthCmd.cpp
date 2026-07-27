@@ -12,57 +12,67 @@ void Server::tryAuthenticate(int fd)
     {
         client->authenticated = true;
         client->sendMessage(
-            ":ircserv 001 " + client->nickname +
+            ":ircserv 001" + client->nickname +
             " :Welcome to the Internet Relay Network " +
             client->getPrefix()
         );
     }
 }
 
-void    Server::executePass(Message msg, int fd)
+void    Server::passCommand(Client *client, const Message &msg)
 {
-    if (this->_clients[fd]->isAuthenticated())
+    if (client->isAuthenticated())
     {
-        raiseError(fd, ERR_ALREADYREGISTERED, msg.command);
+        raiseError(client->fd, ERR_ALREADYREGISTERED, msg.command);
         return;
     }
     if (msg.params.size() < 1)
     {
-        raiseError(fd, ERR_NEEDMOREPARAMS, msg.command);
+        raiseError(client->fd, ERR_NEEDMOREPARAMS, msg.command);
         return;
     }
     if (msg.params[0] != this->_password)
     {
-        raiseError(fd, ERR_PASSWDMISMATCH, msg.command);
+        raiseError(client->fd, ERR_PASSWDMISMATCH, msg.command);
         return ;
     }
-    this->_clients[fd]->hasPassword = true;
-    tryAuthenticate(fd);
+    client->hasPassword = true;
+    tryAuthenticate(client->fd);
 }
 
-void    Server::executeUser(Message msg, int fd)
+void    Server::userCommand(Client *client, const Message &msg)
 {
-    if (this->_clients[fd]->hasUser)
+    if (!client->hasPassword)
     {
-        raiseError(fd, ERR_ALREADYREGISTERED, msg.command);
+        raiseError(client->fd, ERR_NOTREGISTERED, "");
+        return;
+    }
+    if (client->hasUser)
+    {
+        raiseError(client->fd, ERR_ALREADYREGISTERED, msg.command);
         return;
     }
     if (msg.trailing.empty())
     {
-        raiseError(fd, ERR_NEEDMOREPARAMS, msg.command);
+        raiseError(client->fd, ERR_NEEDMOREPARAMS, msg.command);
         return;
     }
-    this->_clients[fd]->username = msg.params[0];
-    this->_clients[fd]->realname = msg.trailing;
-    this->_clients[fd]->hasUser = true;
-    tryAuthenticate(fd);
+    client->username = msg.params[0];
+    client->realname = msg.trailing;
+    client->hasUser = true;
+    tryAuthenticate(client->fd);
 }
 
-void    Server::executeNick(Message msg, int fd)
+void    Server::nickCommand(Client *client, const Message &msg)
 {
+    if (!client->hasPassword)
+    {
+        raiseError(client->fd, ERR_NOTREGISTERED, "");
+        return;
+    }
     if (msg.params.size() < 1)
     {
-        raiseError(fd, ERR_NONICKNAMEGIVEN, msg.command);
+        raiseError(client->fd, ERR_NONICKNAMEGIVEN, msg.command);
         return ;
     }
     /*to be added checking invalid nicknames*/
@@ -70,42 +80,42 @@ void    Server::executeNick(Message msg, int fd)
     /* unique nickname */
     for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
     {
-        if (it->second->nickname == msg.params[0] && it->first != fd)
+        if (it->second->nickname == msg.params[0] && it->second != client)
         {
-            raiseError(fd, ERR_NICKNAMEINUSE, msg.params[0]);
+            raiseError(client->fd, ERR_NICKNAMEINUSE, msg.params[0]);
             return;
         }
     }
-    this->_clients[fd]->nickname = msg.params[0];
-    this->_clients[fd]->hasNick = true;
-    tryAuthenticate(fd);
+    client->nickname = msg.params[0];
+    client->hasNick = true;
+    tryAuthenticate(client->fd);
 }
 
-// void Server::execCmd(const Message &msg, int fd)
-// {
-//     if (msg.command == "PASS")
-//         executePass(msg, fd);
+void Server::execCmd(Client *client , Message &msg)
+{
+    if (msg.command == "PASS")
+        passCommand(client, msg);
 
-//     else if (msg.command == "NICK")
-//         executeNick(msg, fd);
+    else if (msg.command == "NICK")
+        nickCommand(client, msg);
 
-//     else if (msg.command == "USER")
-//         executeUser(msg, fd);
-//     // else if (msg.command == "JOIN")
-//     //     executeJoin(msg, fd);
+    else if (msg.command == "USER")
+        userCommand(client, msg);
+    else if (msg.command == "JOIN")
+        joinCommand(client, msg);
 
-//     // else if (msg.command == "PRIVMSG")
-//     //     executePrivmsg(msg, fd);
+    // else if (msg.command == "PRIVMSG")
+    //     privmsgCommand(client, msg);
 
-//     // else if (msg.command == "TOPIC")
-//     //     executeTopic(msg, fd);
+    else if (msg.command == "TOPIC")
+        topicCommand(client, msg);
 
-//     // else if (msg.command == "MODE")
-//     //     executeMode(msg, fd);
+    else if (msg.command == "MODE")
+        modeCommand(client, msg);
 
-//     // else if (msg.command == "KICK")
-//     //     executeKick(msg, fd);
+    else if (msg.command == "KICK")
+        kickCommand(client, msg);
 
-//     // else if (msg.command == "INVITE")
-//     //     executeInvite(msg, fd);
-// }
+    else if (msg.command == "INVITE")
+        inviteCommand(client, msg);
+}
