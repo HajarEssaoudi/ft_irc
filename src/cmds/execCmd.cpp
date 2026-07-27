@@ -13,7 +13,7 @@ void Server::tryAuthenticate(int fd)
         /* to be fixed: do not display welcome msg in the other Nick*/
         client->authenticated = true;
         client->sendMessage(
-            ":ircserv 001" + client->nickname +
+            ":ircserv 001 " + client->nickname +
             " :Welcome to the Internet Relay Network " +
             client->getPrefix()
         );
@@ -49,4 +49,8 @@ void Server::execCmd(Client *client , Message &msg)
         inviteCommand(client, msg);
     else if (msg.command == "PART")
         partCommand(client, msg);
+    else if (msg.command == "QUIT")
+        quitCommand(client, msg);
+    else if (msg.command == "CAP")
+        return;
 }
