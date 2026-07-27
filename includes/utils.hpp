@@ -18,7 +18,6 @@
 #define ERR_NOTEXTTOSEND      412
 #define ERR_NOSUCHNICK        401
 
-// ── La struct Message ─────────────────────────────
 typedef struct s_msg
 {
     std::string              prefix;
@@ -27,7 +26,6 @@ typedef struct s_msg
     std::string              trailing;
 } Message;
 
-// ── Fonctions de parsing ──────────────────────────
 Message     parseLine(const std::string &line);
 bool        isValidCmd(std::string cmd);
 bool        hasEnoughParams(const Message &msg);

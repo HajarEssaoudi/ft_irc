@@ -10,6 +10,7 @@ void Server::tryAuthenticate(int fd)
         client->hasNick &&
         client->hasUser)
     {
+        /* to be fixed: do not display welcome msg in the other Nick*/
         client->authenticated = true;
         client->sendMessage(
             ":ircserv 001" + client->nickname +
