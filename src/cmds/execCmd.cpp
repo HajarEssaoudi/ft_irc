@@ -14,6 +14,7 @@ void Server::tryAuthenticate(int fd)
         client->authenticated = true;
         client->sendMessage(
             ":ircserv 001 " + client->nickname +
+            ":ircserv 001 " + client->nickname +
             " :Welcome to the Internet Relay Network " +
             client->getPrefix()
         );
@@ -94,6 +95,8 @@ void Server::execCmd(Client *client, Message &msg)
 
     else if (msg.command == "PART")
         partCommand(client, msg);
+    else if (msg.command == "QUIT")
+        quitCommand(client, msg);
 
     else if (msg.command == "CAP")
     {

@@ -14,6 +14,7 @@ SRC =	src/main.cpp \
 		src/cmds/pass.cpp \
 		src/cmds/privmsg.cpp \
 		src/cmds/topic.cpp \
+		src/cmds/quit.cpp \
 		src/cmds/user.cpp
 
 CC = c++

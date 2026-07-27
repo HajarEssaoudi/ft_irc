@@ -61,6 +61,7 @@ class Server
         void kickCommand(Client *client, const Message &msg);
         void modeCommand(Client *client, const Message &msg);
         void privmsgCommand(Client *client, const Message &msg);
+        void quitCommand(Client *client, const Message &msg);
 
         void tryAuthenticate(int fd);
         void raiseError(int fd, int code, const std::string &arg);
