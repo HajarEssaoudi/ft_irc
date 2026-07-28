@@ -65,6 +65,7 @@ class Server
 
         void tryAuthenticate(int fd);
         void raiseError(int fd, int code, const std::string &arg);
+        void raiseReply(int fd, int code, const std::string &arg1, const std::string &arg2 = "");
         void execCmd(Client *client , Message &msg);
 
     private:

@@ -32,13 +32,7 @@ void Server::modeCommand(Client *client, const Message &msg)
         if (channel->hasLimit())
             modes += "l";
 
-        client->sendMessage(":ircserv 324 " +
-                            client->nickname +
-                            " " +
-                            channelName +
-                            " " +
-                            modes +
-                            "\r\n");
+        raiseReply(client->fd, RPL_CHANNELMODEIS, channelName, modes);
         return;
     }
 
@@ -57,12 +51,9 @@ void Server::modeCommand(Client *client, const Message &msg)
     {
         channel->setInviteOnly(true);
 
-        std::string reply = ":" + client->getPrefix() +
-                            " MODE " +
-                            channelName +
-                            " +i\r\n";
-
+        std::string reply = ":" + client->getPrefix() + " MODE " + channelName + " +i";
         channel->broadcast(reply);
+
         return;
     }
 
@@ -71,12 +62,9 @@ void Server::modeCommand(Client *client, const Message &msg)
     {
         channel->setInviteOnly(false);
 
-        std::string reply = ":" + client->getPrefix() +
-                            " MODE " +
-                            channelName +
-                            " -i\r\n";
-
+        std::string reply = ":" + client->getPrefix() + " MODE " + channelName + " -i";
         channel->broadcast(reply);
+
         return;
     }
 
@@ -85,12 +73,9 @@ void Server::modeCommand(Client *client, const Message &msg)
     {
         channel->setTopicRestricted(true);
 
-        std::string reply = ":" + client->getPrefix() +
-                            " MODE " +
-                            channelName +
-                            " +t\r\n";
-
+        std::string reply = ":" + client->getPrefix() + " MODE " + channelName + " +t";
         channel->broadcast(reply);
+
         return;
     }
 
@@ -99,12 +84,9 @@ void Server::modeCommand(Client *client, const Message &msg)
     {
         channel->setTopicRestricted(false);
 
-        std::string reply = ":" + client->getPrefix() +
-                            " MODE " +
-                            channelName +
-                            " -t\r\n";
-
+        std::string reply = ":" + client->getPrefix() + " MODE " + channelName + " -t";
         channel->broadcast(reply);
+
         return;
     }
 
@@ -118,12 +100,10 @@ void Server::modeCommand(Client *client, const Message &msg)
         }
         std::string key = msg.params[2];
         channel->setKey(key);
-        std::string reply = ":" + client->getPrefix() +
-                            " MODE " +
-                            channelName +
-                            " +k\r\n";
 
+        std::string reply = ":" + client->getPrefix() + " MODE " + channelName + " +k";
         channel->broadcast(reply);
+
         return;
     }
 
@@ -132,12 +112,9 @@ void Server::modeCommand(Client *client, const Message &msg)
     {
         channel->removeKey();
 
-        std::string reply = ":" + client->getPrefix() +
-                            " MODE " +
-                            channelName +
-                            " -k\r\n";
-
+        std::string reply = ":" + client->getPrefix() + " MODE " + channelName + " -k";
         channel->broadcast(reply);
+
         return;
     }
 
@@ -154,21 +131,13 @@ void Server::modeCommand(Client *client, const Message &msg)
 
         if (limit <= 0)
         {
-            client->sendMessage(":ircserv 696 " +
-                                client->nickname +
-                                " " +
-                                channelName +
-                                " :Invalid user limit\r\n");
+            client->sendMessage(":ircserv 696 " + client->nickname + " " + channelName + " :Invalid user limit");
             return;
         }
 
         channel->setUserLimit(static_cast<size_t>(limit));
 
-        std::string reply = ":" + client->getPrefix() +
-                            " MODE " +
-                            channelName +
-                            " +l\r\n";
-
+        std::string reply = ":" + client->getPrefix() + " MODE " + channelName + " +l";
         channel->broadcast(reply);
 
         return;
@@ -179,11 +148,7 @@ void Server::modeCommand(Client *client, const Message &msg)
     {
         channel->removeUserLimit();
 
-        std::string reply = ":" + client->getPrefix() +
-                            " MODE " +
-                            channelName +
-                            " -l\r\n";
-
+        std::string reply = ":" + client->getPrefix() + " MODE " + channelName + " -l";
         channel->broadcast(reply);
 
         return;
@@ -210,13 +175,7 @@ void Server::modeCommand(Client *client, const Message &msg)
 
         channel->addOperator(target);
 
-        std::string reply = ":" + client->getPrefix() +
-                        " MODE " +
-                        channelName +
-                        " +o " +
-                        target->nickname +
-                        "\r\n";
-
+        std::string reply = ":" + client->getPrefix() + " MODE " + channelName + " +o " + target->nickname;
         channel->broadcast(reply);
 
         return;
@@ -243,13 +202,7 @@ void Server::modeCommand(Client *client, const Message &msg)
 
         channel->removeOperator(target);
 
-        std::string reply = ":" + client->getPrefix() +
-                            " MODE " +
-                            channelName +
-                            " -o " +
-                            target->nickname +
-                            "\r\n";
-
+        std::string reply = ":" + client->getPrefix() +" MODE " + channelName + " -o " + target->nickname;
         channel->broadcast(reply);
 
         return;

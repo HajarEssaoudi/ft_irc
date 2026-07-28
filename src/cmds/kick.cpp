@@ -37,17 +37,11 @@ void Server::kickCommand(Client *client, const Message &msg)
         return;
     }
 
-    // Build the kick message
-    std::string reply = ":" + client->getPrefix() +
-                        " KICK " +
-                        channelName +
-                        " " +
-                        nick;
+// Build the kick message
+    std::string reply = ":" + client->getPrefix() + " KICK " + channelName + " " + nick;
 
     if (!msg.trailing.empty())
         reply += " :" + msg.trailing;
-
-    reply += "\r\n";
 
     channel->broadcast(reply);
 

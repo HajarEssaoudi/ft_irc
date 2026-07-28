@@ -24,18 +24,11 @@ void Server::topicCommand(Client *client, const Message &msg)
     {
         if (channel->getTopic().empty())
         {
-            client->sendMessage(":ircserv 331 " +
-                                client->nickname + " " +
-                                channelName +
-                                " :No topic is set\r\n");
+            raiseReply(client->fd, RPL_NOTOPIC, channelName);
         }
         else
         {
-            client->sendMessage(":ircserv 332 " +
-                                client->nickname + " " +
-                                channelName +
-                                " :" + channel->getTopic() +
-                                "\r\n");
+            raiseReply(client->fd, RPL_TOPIC, channelName, channel->getTopic());
         }
         return;
     }
@@ -46,11 +39,6 @@ void Server::topicCommand(Client *client, const Message &msg)
 
     channel->setTopic(msg.trailing);
 
-    std::string reply = ":" + client->getPrefix() +
-                        " TOPIC " +
-                        channelName +
-                        " :" +
-                        msg.trailing +
-                        "\r\n";
+    std::string reply = ":" + client->getPrefix() + " TOPIC " + channelName + " :" + msg.trailing;
     channel->broadcast(reply);
 }

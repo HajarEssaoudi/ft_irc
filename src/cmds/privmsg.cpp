@@ -34,19 +34,11 @@ void Server::privmsgCommand(Client *client, const Message &msg)
 
         if (!channel->hasMember(client))
         {
-            client->sendMessage(":ircserv 442 " +
-                                target +
-                                " :You're not on that channel\r\n");
+            raiseError(client->fd, ERR_NOTONCHANNEL, target);
             return;
         }
 
-        std::string reply =
-            ":" + client->getPrefix() +
-            " PRIVMSG " +
-            target +
-            " :" +
-            msg.trailing +
-            "\r\n";
+        std::string reply = ":" + client->getPrefix() + " PRIVMSG " + target + " :" + msg.trailing;
 
         const std::set<Client *> &members = channel->getMembers();
 
@@ -73,12 +65,7 @@ void Server::privmsgCommand(Client *client, const Message &msg)
     std::cout << "Receiver FOUND: " << receiver->nickname
               << " fd=" << receiver->fd << std::endl;
 
-    std::string reply =
-        ":" + client->getPrefix() +
-        " PRIVMSG " +
-        receiver->nickname +
-        " :" +
-        msg.trailing;
+    std::string reply = ":" + client->getPrefix() + " PRIVMSG " + receiver->nickname + " :" + msg.trailing;
 
     std::cout << "Sending: [" << reply << "]" << std::endl;
 

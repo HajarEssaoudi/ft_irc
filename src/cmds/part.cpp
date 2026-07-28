@@ -21,16 +21,14 @@ void Server::partCommand(Client *client, const Message &msg)
         return;
 
     // Build the PART message
-    std::string reply = ":" + client->getPrefix() +
-                        " PART " + channelName;
+    std::string reply = ":" + client->getPrefix() + " PART " + channelName;
 
     if (!msg.trailing.empty())
         reply += " :" + msg.trailing;
 
-    reply += "\r\n";
-
     channel->broadcast(reply);
 
+    // Remove the client
     channel->removeMember(client);
 
     // Remove operator status

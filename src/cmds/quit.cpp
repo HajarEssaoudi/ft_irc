@@ -7,11 +7,7 @@ void Server::quitCommand(Client *client, const Message &msg)
     if (reason.empty())
         reason = "Client Quit";
 
-    std::string reply = ":" +
-                        client->getPrefix() +
-                        " QUIT :" +
-                        reason +
-                        "\r\n";
+    std::string reply = ":" + client->getPrefix() + " QUIT :" + reason;
 
     std::map<std::string, Channel *>::iterator it = _channels.begin();
 

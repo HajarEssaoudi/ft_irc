@@ -63,24 +63,17 @@ void Server::joinCommand(Client *client, const Message &msg)
         channel->removeInvite(client);
 
     // Broadcast the join
-    std::string reply = ":" + client->getPrefix() +
-                        " JOIN " + channelName + "\r\n";
+    std::string reply = ":" + client->getPrefix() + " JOIN " + channelName;
     channel->broadcast(reply);
 
     // Topic
     if (channel->getTopic().empty())
     {
-        client->sendMessage(":ircserv 331 " +
-                            client->nickname + " " +
-                            channelName +
-                            " :No topic is set\r\n");
+        raiseReply(client->fd, RPL_NOTOPIC, channelName);
     }
     else
     {
-        client->sendMessage(":ircserv 332 " +
-                            client->nickname + " " +
-                            channelName +
-                            " :" + channel->getTopic() + "\r\n");
+        raiseReply(client->fd, RPL_TOPIC, channelName, channel->getTopic());
     }
 
     // Members list
@@ -100,17 +93,7 @@ void Server::joinCommand(Client *client, const Message &msg)
         names += (*it)->nickname;
     }
 
-    client->sendMessage(":ircserv 353 " +
-                        client->nickname +
-                        " = " +
-                        channelName +
-                        " :" +
-                        names +
-                        "\r\n");
+    raiseReply(client->fd, RPL_NAMREPLY, channelName, names);
 
-    client->sendMessage(":ircserv 366 " +
-                        client->nickname +
-                        " " +
-                        channelName +
-                        " :End of /NAMES list\r\n");
+    raiseReply(client->fd, RPL_ENDOFNAMES, channelName);
 }

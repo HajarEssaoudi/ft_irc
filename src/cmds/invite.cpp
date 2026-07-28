@@ -33,9 +33,7 @@ void Server::inviteCommand(Client *client, const Message &msg)
     // Target already in channel?
     if (channel->hasMember(target))
     {
-        raiseError(client->fd,
-                   ERR_USERONCHANNEL,
-                   nick + " " + channelName);
+        raiseError(client->fd, ERR_USERONCHANNEL, nick + " " + channelName);
         return;
     }
 
@@ -43,20 +41,8 @@ void Server::inviteCommand(Client *client, const Message &msg)
     channel->invite(target);
 
     // Notify the inviter
-    client->sendMessage(":ircserv 341 " +
-                        client->nickname +
-                        " " +
-                        nick +
-                        " " +
-                        channelName +
-                        "\r\n");
+    raiseReply(client->fd, RPL_INVITING, nick + " " + channelName);
 
     // Notify the client
-    target->sendMessage(":" +
-                        client->getPrefix() +
-                        " INVITE " +
-                        nick +
-                        " :" +
-                        channelName +
-                        "\r\n");
+    target->sendMessage(":" + client->getPrefix() + " INVITE " + nick + " :" + channelName);
 }

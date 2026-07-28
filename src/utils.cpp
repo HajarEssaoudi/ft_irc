@@ -162,3 +162,29 @@ void Server::raiseError(int fd, int code, const std::string &arg)
 
     client->sendMessage(msg);
 }
+
+void Server::raiseReply(int fd, int code, const std::string &arg1, const std::string &arg2 = "")
+{
+    Client *client = _clients[fd];
+    std::string msg = ":ircserv " + toString(code) + " ";
+
+    if (client->nickname.empty() || client->nickname == "*")
+        msg += "* ";
+    else
+        msg += client->nickname + " ";
+
+    switch (code)
+    {
+        case RPL_CHANNELMODEIS:     msg += arg1 + " " + arg2;               break;
+        case RPL_NOTOPIC:           msg += arg1 + " :No topic is set";      break;
+        case RPL_TOPIC:             msg += arg1 + " :" + arg2;              break;
+        case RPL_INVITING:          msg += arg1;                            break;
+        case RPL_NAMREPLY:          msg += "= " + arg1 + " :" + arg2;       break;
+        case RPL_ENDOFNAMES:        msg += arg1 + " :End of /NAMES list";   break;
+
+        default:
+            return;
+    }
+
+    client->sendMessage(msg);
+}
