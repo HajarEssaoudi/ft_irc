@@ -5,9 +5,10 @@ void Server::inviteCommand(Client *client, const Message &msg)
     // Check parameters
     if (msg.params.size() < 2)
     {
-        client->sendMessage("461 INVITE :Not enough parameters\r\n");
+        raiseError(client->fd, ERR_NEEDMOREPARAMS, msg.command);
         return;
     }
+
     std::string nick = msg.params[0];
     std::string channelName = msg.params[1];
 
@@ -29,32 +30,33 @@ void Server::inviteCommand(Client *client, const Message &msg)
     if (!requireOperator(client, channel))
         return;
 
-    // Targeet already in channel?
+    // Target already in channel?
     if (channel->hasMember(target))
     {
-        client->sendMessage("443 " + nick +
-                            " " + channelName +
-                            " :is already on channel\r\n");
+        raiseError(client->fd,
+                   ERR_USERONCHANNEL,
+                   nick + " " + channelName);
         return;
     }
 
     // Store the invitation
-    channel->invite(target); // The invitation allows the client to JOIN later
+    channel->invite(target);
 
     // Notify the inviter
     client->sendMessage(":ircserv 341 " +
-                    client->nickname +
-                    " " +
-                    nick +
-                    " " +
-                    channelName +
-                    "\r\n");
+                        client->nickname +
+                        " " +
+                        nick +
+                        " " +
+                        channelName +
+                        "\r\n");
+
     // Notify the client
     target->sendMessage(":" +
-                    client->getPrefix() +
-                    " INVITE " +
-                    nick +
-                    " :" +
-                    channelName +
-                    "\r\n");
+                        client->getPrefix() +
+                        " INVITE " +
+                        nick +
+                        " :" +
+                        channelName +
+                        "\r\n");
 }

@@ -5,7 +5,7 @@ void Server::topicCommand(Client *client, const Message &msg)
     // Check parameters
     if (msg.params.empty())
     {
-        client->sendMessage("461 TOPIC :Not enough parameters\r\n");
+        raiseError(client->fd, ERR_NEEDMOREPARAMS, msg.command);
         return;
     }
     std::string channelName = msg.params[0];

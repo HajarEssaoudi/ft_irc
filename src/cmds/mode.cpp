@@ -5,7 +5,7 @@ void Server::modeCommand(Client *client, const Message &msg)
     // Check parameters
      if (msg.params.empty())
     {
-        client->sendMessage("461 MODE :Not enough parameters\r\n");
+        raiseError(client->fd, ERR_NEEDMOREPARAMS, msg.command);
         return;
     }
     std::string channelName = msg.params[0];
@@ -113,7 +113,7 @@ void Server::modeCommand(Client *client, const Message &msg)
     {
         if (msg.params.size() < 3)
         {
-            client->sendMessage("461 MODE :Not enough parameters\r\n");
+            raiseError(client->fd, ERR_NEEDMOREPARAMS, msg.command);
             return;
         }
         std::string key = msg.params[2];
@@ -146,7 +146,7 @@ void Server::modeCommand(Client *client, const Message &msg)
     {
         if (msg.params.size() < 3)
         {
-            client->sendMessage("461 MODE :Not enough parameters\r\n");
+            raiseError(client->fd, ERR_NEEDMOREPARAMS, msg.command);
             return;
         }
 
@@ -194,7 +194,7 @@ void Server::modeCommand(Client *client, const Message &msg)
     {
         if (msg.params.size() < 3)
         {
-            client->sendMessage("461 MODE :Not enough parameters\r\n");
+            raiseError(client->fd, ERR_NEEDMOREPARAMS, msg.command);
             return;
         }
 
@@ -204,11 +204,7 @@ void Server::modeCommand(Client *client, const Message &msg)
 
         if (!channel->hasMember(target))
         {
-            client->sendMessage("441 " +
-                                target->nickname +
-                                " " +
-                                channelName +
-                                " :They aren't on that channel\r\n");
+            raiseError(client->fd, ERR_USERNOTINCHANNEL, target->nickname + " " + channelName);
             return;
         }
 
@@ -231,7 +227,7 @@ void Server::modeCommand(Client *client, const Message &msg)
     {
         if (msg.params.size() < 3)
         {
-            client->sendMessage("461 MODE :Not enough parameters\r\n");
+            raiseError(client->fd, ERR_NEEDMOREPARAMS, msg.command);
             return;
         }
 
@@ -241,11 +237,7 @@ void Server::modeCommand(Client *client, const Message &msg)
 
         if (!channel->hasMember(target))
         {
-            client->sendMessage("441 " +
-                                target->nickname +
-                                " " +
-                                channelName +
-                                " :They aren't on that channel\r\n");
+            raiseError(client->fd, ERR_USERNOTINCHANNEL, target->nickname + " " + channelName);
             return;
         }
 
@@ -263,8 +255,6 @@ void Server::modeCommand(Client *client, const Message &msg)
         return;
     }
 
-    // Uknown cases
-    client->sendMessage(":ircserv 472 " +
-                    mode +
-                    " :is unknown mode char to me\r\n");
+    // Uknown mode
+    raiseError(client->fd, ERR_UNKNOWNMODE, mode);
 }

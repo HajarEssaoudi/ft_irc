@@ -18,6 +18,17 @@
 #define ERR_NOTEXTTOSEND      412
 #define ERR_NOSUCHNICK        401
 
+// Channel error codes
+#define ERR_NOSUCHCHANNEL     403
+#define ERR_USERNOTINCHANNEL  441
+#define ERR_NOTONCHANNEL      442
+#define ERR_USERONCHANNEL     443
+#define ERR_CHANNELISFULL     471
+#define ERR_UNKNOWNMODE       472
+#define ERR_INVITEONLYCHAN    473
+#define ERR_BADCHANNELKEY     475
+#define ERR_CHANOPRIVSNEEDED  482
+
 typedef struct s_msg
 {
     std::string              prefix;

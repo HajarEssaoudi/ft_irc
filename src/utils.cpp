@@ -134,17 +134,31 @@ void Server::raiseError(int fd, int code, const std::string &arg)
 
     switch (code)
     {
-        case ERR_UNKNOWNCOMMAND:    msg += arg + " :Unknown command";               break;
-        case ERR_NEEDMOREPARAMS:    msg += arg + " :Not enough parameters";         break;
-        case ERR_NONICKNAMEGIVEN:   msg += ":No nickname given";                    break;
-        case ERR_NICKNAMEINUSE:     msg += arg + " :Nickname is already in use";    break;
-        case ERR_ALREADYREGISTERED: msg += ":You may not reregister";               break;
-        case ERR_PASSWDMISMATCH:    msg += ":Password incorrect";                   break;
-        case ERR_NOTREGISTERED:     msg += ":You have not registered";              break;
-        case ERR_NORECIPIENT: msg += ":No recipient given (" + arg + ")";           break;
-        case ERR_NOTEXTTOSEND:      msg += ":No text to send";                      break;
-        case ERR_NOSUCHNICK:        msg += arg + ":No such nick/channel";                 break;
-        default: return;
+        case ERR_UNKNOWNCOMMAND:    msg += arg + " :Unknown command";                break;
+        case ERR_NEEDMOREPARAMS:    msg += arg + " :Not enough parameters";          break;
+        case ERR_NONICKNAMEGIVEN:   msg += ":No nickname given";                     break;
+        case ERR_NICKNAMEINUSE:     msg += arg + " :Nickname is already in use";     break;
+        case ERR_ALREADYREGISTERED: msg += ":You may not reregister";                break;
+        case ERR_PASSWDMISMATCH:    msg += ":Password incorrect";                    break;
+        case ERR_NOTREGISTERED:     msg += ":You have not registered";               break;
+        case ERR_NORECIPIENT:       msg += ":No recipient given (" + arg + ")";      break;
+        case ERR_NOTEXTTOSEND:      msg += ":No text to send";                       break;
+        case ERR_NOSUCHNICK:        msg += arg + " :No such nick/channel";           break;
+
+        // Channel errors
+        case ERR_NOSUCHCHANNEL:     msg += arg + " :No such channel";                break;
+        case ERR_USERNOTINCHANNEL:  msg += arg + " :They aren't on that channel";    break;
+        case ERR_NOTONCHANNEL:      msg += arg + " :You're not on that channel";     break;
+        case ERR_USERONCHANNEL:     msg += arg + " :is already on channel";          break;
+        case ERR_CHANNELISFULL:     msg += arg + " :Cannot join channel (+l)";       break;
+        case ERR_UNKNOWNMODE:       msg += arg + " :is unknown mode char to me";     break;
+        case ERR_INVITEONLYCHAN:    msg += arg + " :Cannot join channel (+i)";       break;
+        case ERR_BADCHANNELKEY:     msg += arg + " :Cannot join channel (+k)";       break;
+        case ERR_CHANOPRIVSNEEDED:  msg += arg + " :You're not channel operator";    break;
+
+        default:
+            return;
     }
+
     client->sendMessage(msg);
 }

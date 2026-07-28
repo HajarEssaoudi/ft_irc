@@ -5,15 +5,16 @@ void Server::joinCommand(Client *client, const Message &msg)
     // Validate parameters
     if (msg.params.empty())
     {
-        client->sendMessage("461 JOIN :Not enough parameters\r\n");
+        raiseError(client->fd, ERR_NEEDMOREPARAMS, msg.command);
         return;
     }
+
     std::string channelName = msg.params[0];
 
     // Validate the channel name
     if (channelName.empty() || channelName[0] != '#')
     {
-        client->sendMessage("403 " + channelName + " :No such channel\r\n");
+        raiseError(client->fd, ERR_NOSUCHCHANNEL, channelName);
         return;
     }
 
@@ -29,8 +30,7 @@ void Server::joinCommand(Client *client, const Message &msg)
     // Check invite-only
     if (channel->isInviteOnly() && !channel->isInvited(client))
     {
-        client->sendMessage("473 " + channelName +
-                            " :Cannot join channel (+i)\r\n");
+        raiseError(client->fd, ERR_INVITEONLYCHAN, channelName);
         return;
     }
 
@@ -39,8 +39,7 @@ void Server::joinCommand(Client *client, const Message &msg)
     {
         if (msg.params.size() < 2 || !channel->checkKey(msg.params[1]))
         {
-            client->sendMessage("475 " + channelName +
-                                " :Cannot join channel (+k)\r\n");
+            raiseError(client->fd, ERR_BADCHANNELKEY, channelName);
             return;
         }
     }
@@ -48,39 +47,40 @@ void Server::joinCommand(Client *client, const Message &msg)
     // Check the user limit
     if (channel->isFull())
     {
-        client->sendMessage("471 " + channelName +
-                            " :Cannot join channel (+l)\r\n");
+        raiseError(client->fd, ERR_CHANNELISFULL, channelName);
         return;
     }
 
-    channel->addMember(client); // add member
-    // If first member become the operator
+    // Add member
+    channel->addMember(client);
+
+    // First member becomes operator
     if (channel->getMemberCount() == 1)
         channel->addOperator(client);
-    
-    // If the user joined using an invitation, remove it
+
+    // Remove invitation if it exists
     if (channel->isInvited(client))
         channel->removeInvite(client);
-    
+
     // Broadcast the join
     std::string reply = ":" + client->getPrefix() +
-                    " JOIN " + channelName + "\r\n";
+                        " JOIN " + channelName + "\r\n";
     channel->broadcast(reply);
 
     // Topic
     if (channel->getTopic().empty())
     {
         client->sendMessage(":ircserv 331 " +
-            client->nickname + " " +
-            channelName +
-            " :No topic is set\r\n");
+                            client->nickname + " " +
+                            channelName +
+                            " :No topic is set\r\n");
     }
     else
     {
         client->sendMessage(":ircserv 332 " +
-            client->nickname + " " +
-            channelName +
-            " :" + channel->getTopic() + "\r\n");
+                            client->nickname + " " +
+                            channelName +
+                            " :" + channel->getTopic() + "\r\n");
     }
 
     // Members list
@@ -88,8 +88,8 @@ void Server::joinCommand(Client *client, const Message &msg)
     std::set<Client*>::const_iterator it;
 
     for (it = channel->getMembers().begin();
-        it != channel->getMembers().end();
-        ++it)
+         it != channel->getMembers().end();
+         ++it)
     {
         if (!names.empty())
             names += " ";
@@ -99,16 +99,18 @@ void Server::joinCommand(Client *client, const Message &msg)
 
         names += (*it)->nickname;
     }
+
     client->sendMessage(":ircserv 353 " +
-    client->nickname +
-    " = " +
-    channelName +
-    " :" +
-    names +
-    "\r\n");
+                        client->nickname +
+                        " = " +
+                        channelName +
+                        " :" +
+                        names +
+                        "\r\n");
+
     client->sendMessage(":ircserv 366 " +
-    client->nickname +
-    " " +
-    channelName +
-    " :End of /NAMES list\r\n");
+                        client->nickname +
+                        " " +
+                        channelName +
+                        " :End of /NAMES list\r\n");
 }
