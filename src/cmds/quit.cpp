@@ -36,6 +36,7 @@ void Server::quitCommand(Client *client, const Message &msg)
 
         ++it;
     }
-
+    //zedtha 
+    client->sendMessage("ERROR :Closing connection :" + reason);
     removeClient(client->getFd());
 }

@@ -46,7 +46,7 @@ typedef struct s_msg
 } Message;
 
 Message     parseLine(const std::string &line);
-bool        isValidCmd(std::string cmd);
+// bool        isValidCmd(std::string cmd);
 bool        hasEnoughParams(const Message &msg);
 std::string toString(int value);
 

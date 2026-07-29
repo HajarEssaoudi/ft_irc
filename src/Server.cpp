@@ -183,6 +183,8 @@ void Server::readClientData(int fd)
         removeClient(fd);
         return;
     }
+    if (_clients.find(fd) == _clients.end())
+        return;
     _clients[fd]->buffer += std::string(buf, bytes);
     size_t pos;
     while((pos = _clients[fd]->buffer.find("\r\n")) != std::string::npos)
@@ -191,18 +193,10 @@ void Server::readClientData(int fd)
         _clients[fd]->buffer.erase(0, pos + 2);
         if(!msg.empty())
             processMessage(fd, msg);
+        if (_clients.find(fd) == _clients.end())
+        return;
     }
 }
-// void Server:: processMessage(int fd, const std::string& msg)
-// {
-//     std::cout << "msg received fd=" << fd << " : [" << msg << "]" << std::endl;
-
-//     //parsing
-
-//     if (_clients.find(fd) != _clients.end())
-//         _clients[fd]->sendMessage(":server notice * :Msg reçu : " + msg);
-// }
-
 void Server::processMessage(int fd, const std::string &msg)
 {
     std::map<int, Client*>::iterator it = _clients.find(fd);
