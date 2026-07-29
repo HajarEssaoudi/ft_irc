@@ -163,7 +163,7 @@ void Server::raiseError(int fd, int code, const std::string &arg)
     client->sendMessage(msg);
 }
 
-void Server::raiseReply(int fd, int code, const std::string &arg1, const std::string &arg2 = "")
+void Server::raiseReply(int fd, int code, const std::string &arg1, const std::string &arg2)
 {
     Client *client = _clients[fd];
     std::string msg = ":ircserv " + toString(code) + " ";
