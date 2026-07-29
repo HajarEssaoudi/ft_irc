@@ -94,7 +94,7 @@ bool Server::isValidCmd(Message& msg)
         msg.command == "JOIN"   || msg.command == "PRIVMSG" || msg.command == "KICK"  ||
         msg.command == "MODE"   || msg.command == "INVITE"  || msg.command == "TOPIC" || msg.command == "PART" || msg.command == "CAP" || msg.command == "QUIT")
     {
-        hasEnoughParams(msg);
+        // hasEnoughParams(msg);
         return true;
     }
     return false;

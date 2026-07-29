@@ -9,12 +9,11 @@ Server::~Server()
 {
     for(std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
         delete it->second;
+    _clients.clear(); 
     std::map<std::string, Channel*>::iterator it;
-
     for (it = _channels.begin(); it != _channels.end(); ++it)
         delete it->second;
     _channels.clear();
-
     if(_server_fd != -1)
         close(_server_fd);
     std::cout<< "Server stopped." <<std::endl;
@@ -47,7 +46,7 @@ Client* Server::getClientByNick(const std::string& nick)
         //           << std::endl;
         if (it->second->nickname == nick)
         {
-            std::cout << "FOUND!" << std::endl;
+            // std::cout << "FOUND!" << std::endl;
             return it->second;
         }
     }
@@ -111,8 +110,9 @@ void Server::accepterNewClient()
     {
         std::cerr << "Error: accept() failed." << std::endl;
         return;
-    }  
-    if(fcntl(clientFd, F_SETFL, O_NONBLOCK) == -1)
+    }
+    int flags = fcntl(clientFd, F_GETFL);
+    if(fcntl(clientFd, F_SETFL, flags | O_NONBLOCK) == -1)
     {
         std::cerr << "Error: fcntl() failed." << std::endl;
         close(clientFd);
