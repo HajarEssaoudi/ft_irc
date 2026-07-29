@@ -17,7 +17,7 @@ Server::~Server()
 
     if(_server_fd != -1)
         close(_server_fd);
-    std::cout<<"Server stopped"<<std::endl;
+    std::cout<< "Server stopped." <<std::endl;
 }
 
 //getters
@@ -36,35 +36,22 @@ const std::string& Server::getPassword()const
     return(_password);
 }
 
-// Client* Server::getClientByNick(const std::string& nick)
-// {
-//     for(std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
-//     {
-//         if(it->second->nickname == nick)
-//             return(it->second);
-//     }
-//     return(NULL);
-// }
 Client* Server::getClientByNick(const std::string& nick)
 {
-    std::cout << "\nSearching for: [" << nick << "]" << std::endl;
+    // std::cout << "\nSearching for: [" << nick << "]" << std::endl;
 
-    for (std::map<int, Client*>::iterator it = _clients.begin();
-         it != _clients.end();
-         ++it)
+    for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
     {
-        std::cout << "Connected client: fd=" << it->first
-                  << " nick=[" << it->second->nickname << "]"
-                  << std::endl;
-
+        // std::cout << "Connected client: fd=" << it->first
+        //           << " nick=[" << it->second->nickname << "]"
+        //           << std::endl;
         if (it->second->nickname == nick)
         {
             std::cout << "FOUND!" << std::endl;
             return it->second;
         }
     }
-
-    std::cout << "NOT FOUND!" << std::endl;
+    // std::cout << "NOT FOUND!" << std::endl;
     return NULL;
 }
 void Server::addPollFd(int fd)
@@ -92,16 +79,14 @@ void Server::setUpSocket()
 {
     _server_fd = socket(AF_INET, SOCK_STREAM, 0);
     if(_server_fd == -1)
-        throw std::runtime_error("Socket()_ERROR");
+        throw std::runtime_error("Error: socket() failed.");
     int opt = 1;
     if(setsockopt(_server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1)
-        throw std::runtime_error("setsockopt()_ERROR");
+        throw std::runtime_error("Error: setsockopt() failed.");
 
-    // fcntl(_server_fd, F_SETFL, flags | O_NONBLOCK);
     int flags = fcntl(_server_fd, F_GETFL);
-
     if(fcntl(_server_fd, F_SETFL, flags | O_NONBLOCK) == -1)
-        throw std::runtime_error("fctl_ERROR");
+        throw std::runtime_error("Error: fcntl() failed.");
     
     struct sockaddr_in addr;
     memset(&addr, 0, sizeof(addr));
@@ -110,9 +95,9 @@ void Server::setUpSocket()
     addr.sin_addr.s_addr = INADDR_ANY;
 
     if(bind(_server_fd, (struct sockaddr*)&addr, sizeof(addr)) == -1)
-        throw std::runtime_error("bind()_ERROR ---- Port already used?");
+        throw std::runtime_error("Error: bind() failed. Port already in use?");
     if(listen(_server_fd, SOMAXCONN) == -1)
-        throw std::runtime_error("listen()_ERROR");
+        throw std::runtime_error("Error: listen() failed.");
 
     addPollFd(_server_fd);
 }
@@ -124,18 +109,18 @@ void Server::accepterNewClient()
     int clientFd = accept(_server_fd, (struct sockaddr*)&clientAddr, &clientLen);
     if(clientFd == -1)
     {
-        std::cerr<<"Accept()_ERROR\n";
+        std::cerr << "Error: accept() failed." << std::endl;
         return;
     }  
     if(fcntl(clientFd, F_SETFL, O_NONBLOCK) == -1)
     {
-        std::cerr<<"fcntl()_ERROR\n";
+        std::cerr << "Error: fcntl() failed." << std::endl;
         close(clientFd);
         return;
     }
     _clients[clientFd] = new Client(clientFd);
     addPollFd(clientFd);
-    std::cout<<"Client connected fd = "<<clientFd <<std::endl;
+    std::cout << "New client connected (fd=" << clientFd << ")" << std::endl;
 }
 
 void Server::start()
@@ -144,14 +129,14 @@ void Server::start()
     signal(SIGINT, signalHandler);
     signal(SIGQUIT, signalHandler);
     setUpSocket();
-    std::cout<<"the server has been launched"<<_port <<std::endl;
-    std::cout<<"waiting..."<<std::endl;
+    std::cout << "Server launched on port " << _port << std::endl;
+    std::cout << "Waiting for connections..." << std::endl;
     while(true)
     {
         int ready = poll(_fds.data(), _fds.size(), -1);
         if(ready == -1)
         {
-            std::cerr<<"poll_ERROR"<<std::endl;
+            std::cerr << "Error: poll() failed." << std::endl;
             break;
         }
         size_t size = _fds.size();
@@ -177,9 +162,9 @@ void Server::readClientData(int fd)
     if(bytes <=0)
     {
         if(bytes == 0)
-            std::cout<<"Client fd= "<<fd<<"disconnected"<<std::endl;
+            std::cout << "Client (fd=" << fd << ") disconnected." << std::endl;
         else
-            std::cerr<<"recv()_ERROR fd= "<<fd<<std::endl;
+            std::cerr << "Error: recv() failed (fd=" << fd << ")." << std::endl;
         removeClient(fd);
         return;
     }
@@ -218,7 +203,7 @@ void Server::removeClient(int fd)
 {
     if(_clients.find(fd) == _clients.end())
         return;
-    std::cout<<"Supp client fd= "<<fd<<"nickname: "<<_clients[fd]->nickname<<std::endl;
+    std::cout << "Client removed (fd=" << fd  << ", nick=" << _clients[fd]->nickname << ")" << std::endl;
     delete _clients[fd];
     _clients.erase(fd);
     removePollFd(fd);
@@ -260,8 +245,6 @@ void Server::removeChannel(const std::string &name)
 
 void Server::signalHandler(int signal)
 {
-    std::cout<<"\nSignal "<<signal<<" Server shutting down..."<<std::endl;
-    // if(instance != NULL)
-    //     delete instance;
+    std::cout << "\nSignal " << signal << " received. Shutting down server..." << std::endl;
     return;
 }
