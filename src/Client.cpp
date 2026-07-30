@@ -36,5 +36,6 @@ void Client::sendMessage(const std::string& msg)
 {
     std::string full = msg + "\r\n";
     if(send(fd, full.c_str(), full.size(), 0) == -1)
-        std::cerr <<"send()_ERROR fd= "<<fd<<std::endl;
+        std::cerr << "Error: send() failed (fd=" << fd << ")." << std::endl;
+
 }

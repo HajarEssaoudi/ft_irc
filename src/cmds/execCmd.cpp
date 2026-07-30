@@ -39,14 +39,14 @@ void Server::tryAuthenticate(int fd)
 
 void Server::execCmd(Client *client, Message &msg)
 {
-    std::cout << "\n========== NEW COMMAND ==========\n";
-    std::cout << "Command = [" << msg.command << "]" << std::endl;
+    // std::cout << "\n========== NEW COMMAND ==========\n";
+    // std::cout << "Command = [" << msg.command << "]" << std::endl;
 
-    for (size_t i = 0; i < msg.params.size(); i++)
-        std::cout << "Param " << i << " = [" << msg.params[i] << "]" << std::endl;
+    // for (size_t i = 0; i < msg.params.size(); i++)
+    //     std::cout << "Param " << i << " = [" << msg.params[i] << "]" << std::endl;
 
-    std::cout << "Trailing = [" << msg.trailing << "]" << std::endl;
-    std::cout << "=================================\n";
+    // std::cout << "Trailing = [" << msg.trailing << "]" << std::endl;
+    // std::cout << "=================================\n";
 
     if (msg.command == "PASS") passCommand(client, msg);
 
