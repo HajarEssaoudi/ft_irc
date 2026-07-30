@@ -35,8 +35,6 @@ void Server::tryAuthenticate(int fd)
     }
 }
 
-
-
 void Server::execCmd(Client *client, Message &msg)
 {
     if (msg.command == "PASS") passCommand(client, msg);
