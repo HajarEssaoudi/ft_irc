@@ -37,20 +37,13 @@ const std::string& Server::getPassword()const
 
 Client* Server::getClientByNick(const std::string& nick)
 {
-    // std::cout << "\nSearching for: [" << nick << "]" << std::endl;
-
     for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
     {
-        // std::cout << "Connected client: fd=" << it->first
-        //           << " nick=[" << it->second->nickname << "]"
-        //           << std::endl;
         if (it->second->nickname == nick)
         {
-            // std::cout << "FOUND!" << std::endl;
             return it->second;
         }
     }
-    // std::cout << "NOT FOUND!" << std::endl;
     return NULL;
 }
 void Server::addPollFd(int fd)
