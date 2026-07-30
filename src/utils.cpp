@@ -87,33 +87,6 @@ Message parseLine(const std::string &rawline)
     return msg;
 }
 
-
-bool Server::isValidCmd(Message& msg)
-{
-    if (msg.command == "PASS"   || msg.command == "NICK"    || msg.command == "USER"  ||
-        msg.command == "JOIN"   || msg.command == "PRIVMSG" || msg.command == "KICK"  ||
-        msg.command == "MODE"   || msg.command == "INVITE"  || msg.command == "TOPIC" || msg.command == "PART" || msg.command == "CAP" || msg.command == "QUIT")
-    {
-        // hasEnoughParams(msg);
-        return true;
-    }
-    return false;
-}
-
-bool hasEnoughParams(const Message &msg)
-{
-    if (msg.command == "PASS")    return msg.params.size() >= 1;
-    if (msg.command == "NICK")    return msg.params.size() >= 1;
-    if (msg.command == "USER")    return msg.params.size() >= 3 && !msg.trailing.empty();
-    if (msg.command == "JOIN")    return msg.params.size() >= 1;
-    // if (msg.command == "PRIVMSG") return msg.params.size() >= 1 && !msg.trailing.empty();
-    if (msg.command == "KICK")    return msg.params.size() >= 2;
-    if (msg.command == "INVITE")  return msg.params.size() >= 2;
-    if (msg.command == "TOPIC")   return msg.params.size() >= 1;
-    if (msg.command == "MODE")    return msg.params.size() >= 2;
-    return true;
-}
-
 std::string toString(int value)
 {
     std::ostringstream oss;
@@ -144,6 +117,7 @@ void Server::raiseError(int fd, int code, const std::string &arg)
         case ERR_NORECIPIENT:       msg += ":No recipient given (" + arg + ")";      break;
         case ERR_NOTEXTTOSEND:      msg += ":No text to send";                       break;
         case ERR_NOSUCHNICK:        msg += arg + " :No such nick/channel";           break;
+        case ERR_NOORIGIN:          msg += ":No origin specified";                   break;
 
         // Channel errors
         case ERR_NOSUCHCHANNEL:     msg += arg + " :No such channel";                break;
@@ -175,12 +149,15 @@ void Server::raiseReply(int fd, int code, const std::string &arg1, const std::st
 
     switch (code)
     {
-        case RPL_CHANNELMODEIS:     msg += arg1 + " " + arg2;               break;
-        case RPL_NOTOPIC:           msg += arg1 + " :No topic is set";      break;
-        case RPL_TOPIC:             msg += arg1 + " :" + arg2;              break;
-        case RPL_INVITING:          msg += arg1;                            break;
-        case RPL_NAMREPLY:          msg += "= " + arg1 + " :" + arg2;       break;
-        case RPL_ENDOFNAMES:        msg += arg1 + " :End of /NAMES list";   break;
+        case RPL_WHOISUSER:         msg += arg1 + " " + arg2;                       break;
+        case RPL_ENDOFWHOIS:        msg += arg1 + " :End of WHOIS list";            break;
+        //channels
+        case RPL_CHANNELMODEIS:     msg += arg1 + " " + arg2;                       break;
+        case RPL_NOTOPIC:           msg += arg1 + " :No topic is set";              break;
+        case RPL_TOPIC:             msg += arg1 + " :" + arg2;                      break;
+        case RPL_INVITING:          msg += arg1;                                    break;
+        case RPL_NAMREPLY:          msg += "= " + arg1 + " :" + arg2;               break;
+        case RPL_ENDOFNAMES:        msg += arg1 + " :End of /NAMES list";           break;
 
         default:
             return;

@@ -193,10 +193,7 @@ void Server::processMessage(int fd, const std::string &msg)
 
     if (message.command.empty())
         return;
-    if (isValidCmd(message))
-        execCmd(client , message);
-    else
-        raiseError(fd, ERR_UNKNOWNCOMMAND, message.command);
+    execCmd(client , message);
 }
 
 void Server::removeClient(int fd)

@@ -28,6 +28,11 @@
 #define ERR_INVITEONLYCHAN    473
 #define ERR_BADCHANNELKEY     475
 #define ERR_CHANOPRIVSNEEDED  482
+#define ERR_NOORIGIN          409
+
+// ── Codes Replies IRC ────────────────────────────
+#define RPL_WHOISUSER   311
+#define RPL_ENDOFWHOIS  318
 
 // Channel reply codes
 #define RPL_NOTOPIC        331
@@ -36,6 +41,9 @@
 #define RPL_NAMREPLY       353
 #define RPL_ENDOFNAMES     366
 #define RPL_CHANNELMODEIS  324
+
+
+//irssi error
 
 typedef struct s_msg
 {
@@ -46,8 +54,6 @@ typedef struct s_msg
 } Message;
 
 Message     parseLine(const std::string &line);
-// bool        isValidCmd(std::string cmd);
-bool        hasEnoughParams(const Message &msg);
 std::string toString(int value);
 
 #endif

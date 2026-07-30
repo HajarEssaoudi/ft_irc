@@ -12,7 +12,7 @@ void    Server::userCommand(Client *client, const Message &msg)
         raiseError(client->fd, ERR_ALREADYREGISTERED, msg.command);
         return;
     }
-    if (msg.trailing.empty())
+    if (msg.params.size() < 3 || msg.trailing.empty())
     {
         raiseError(client->fd, ERR_NEEDMOREPARAMS, msg.command);
         return;

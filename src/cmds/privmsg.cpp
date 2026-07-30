@@ -52,7 +52,20 @@ void Server::privmsgCommand(Client *client, const Message &msg)
 
         return;
     }
+//-------------------------------------------------------------------
+    std::cout << "\n===== Connected clients =====" << std::endl;
 
+    for (std::map<int, Client*>::iterator it = _clients.begin();
+        it != _clients.end(); ++it)
+    {
+        std::cout << "fd=" << it->first
+                << " nick=[" << it->second->nickname << "]"
+                << " authenticated=" << it->second->authenticated
+                << std::endl;
+    }
+
+    std::cout << "Searching for [" << target << "]" << std::endl;
+//-------------------------------------------------------------------
     Client *receiver = getClientByNick(target);
 
     if (!receiver)
@@ -64,6 +77,14 @@ void Server::privmsgCommand(Client *client, const Message &msg)
 
     std::cout << "Receiver FOUND: " << receiver->nickname
               << " fd=" << receiver->fd << std::endl;
+
+    /*Handle DCC: FILE TRANSFER => BONUS*/
+    std::string text = msg.trailing;
+
+    if (!text.empty() && text[0] == '\001' && text.find("DCC ") != std::string::npos)
+    {
+        std::cout << "DCC request detected" << std::endl;
+    }
 
     std::string reply = ":" + client->getPrefix() + " PRIVMSG " + receiver->nickname + " :" + msg.trailing;
 
