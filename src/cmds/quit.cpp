@@ -2,7 +2,7 @@
 
 void Server::quitCommand(Client *client, const Message &msg)
 {
-    // Check inf if client is auth before running join
+    // Checking if client is auth
     if (!client->isAuthenticated())
     {
         raiseError(client->fd, ERR_NOTREGISTERED, "");

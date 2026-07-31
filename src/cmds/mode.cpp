@@ -2,7 +2,7 @@
 
 void Server::modeCommand(Client *client, const Message &msg)
 {
-    // Check inf if client is auth before running join
+    // Checking if client is auth
     if (!client->isAuthenticated())
     {
         raiseError(client->fd, ERR_NOTREGISTERED, "");
@@ -100,16 +100,19 @@ void Server::modeCommand(Client *client, const Message &msg)
     // Handling +k
     if (mode == "+k")
     {
-        if (msg.params.size() < 3)
+        std::string key;
+        if (msg.params.size() >= 3)
+            key = msg.params[2];
+        else if (!msg.trailing.empty())
+            key = msg.trailing;
+        else
         {
             raiseError(client->fd, ERR_NEEDMOREPARAMS, msg.command);
             return;
         }
-        std::string key = msg.params[2];
         channel->setKey(key);
-        std::cout << "Stored key = [" << key << "]" << std::endl;
-        std::cout << "hasKey = " << channel->hasKey() << std::endl;
-        std::string reply = ":" + client->getPrefix() + " MODE " + channelName + " +k";
+
+        std::string reply = ":" + client->getPrefix() + " MODE " + channelName + " +k " + key;
         channel->broadcast(reply);
 
         return;
@@ -145,7 +148,7 @@ void Server::modeCommand(Client *client, const Message &msg)
 
         channel->setUserLimit(static_cast<size_t>(limit));
 
-        std::string reply = ":" + client->getPrefix() + " MODE " + channelName + " +l";
+        std::string reply = ":" + client->getPrefix() + " MODE " + channelName + " +l " + msg.params[2];
         channel->broadcast(reply);
 
         return;

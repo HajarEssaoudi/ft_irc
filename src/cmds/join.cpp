@@ -2,7 +2,7 @@
 
 void Server::joinCommand(Client *client, const Message &msg)
 {
-    // Check inf if client is auth before running join
+    // Checking if client is auth
     if (!client->isAuthenticated())
     {
         raiseError(client->fd, ERR_NOTREGISTERED, "");
@@ -70,7 +70,7 @@ void Server::joinCommand(Client *client, const Message &msg)
         channel->removeInvite(client);
 
     // Broadcast the join
-    std::string reply = ":" + client->getPrefix() + " JOIN " + channelName;
+    std::string reply = ":" + client->getPrefix() + " JOIN :" + channelName;
     channel->broadcast(reply);
 
     // Topic
