@@ -129,6 +129,7 @@ void Server::raiseError(int fd, int code, const std::string &arg)
         case ERR_INVITEONLYCHAN:    msg += arg + " :Cannot join channel (+i)";       break;
         case ERR_BADCHANNELKEY:     msg += arg + " :Cannot join channel (+k)";       break;
         case ERR_CHANOPRIVSNEEDED:  msg += arg + " :You're not channel operator";    break;
+        case ERR_ERRONEUSNICKNAME:  msg += arg + " :Erroneous nickname";             break;
 
         default:
             return;
@@ -164,4 +165,31 @@ void Server::raiseReply(int fd, int code, const std::string &arg1, const std::st
     }
 
     client->sendMessage(msg);
+}
+
+bool Server::isValidNickname(const std::string &nick)
+{
+    if (nick.empty())
+        return false;
+
+    if (std::isdigit(nick[0]))
+        return false;
+
+    for (size_t i = 0; i < nick.size(); i++)
+    {
+        char c = nick[i];
+
+        if (!std::isalnum(c) &&
+            c != '-' &&
+            c != '_' &&
+            c != '[' &&
+            c != ']' &&
+            c != '\\' &&
+            c != '{' &&
+            c != '}' &&
+            c != '|')
+            return false;
+    }
+
+    return true;
 }

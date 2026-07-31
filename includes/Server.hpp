@@ -69,6 +69,8 @@ class Server
         void raiseError(int fd, int code, const std::string &arg);
         void raiseReply(int fd, int code, const std::string &arg1, const std::string &arg2 = "");
         void execCmd(Client *client , Message &msg);
+        bool isValidNickname(const std::string &nick);
+
         //bonus
         void execBot(Client *client, const std::string &message);
 

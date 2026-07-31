@@ -17,11 +17,12 @@ void Server::nickCommand(Client *client, const Message &msg)
     }
 
     // TODO: Validate nickname
-    // if (!isValidNickname(msg.params[0]))
-    // {
-    //     raiseError(client->fd, ERR_ERRONEUSNICKNAME, msg.params[0]);
-    //     return;
-    // }
+    if (!isValidNickname(msg.params[0]))
+    {
+        raiseError(client->fd, ERR_ERRONEUSNICKNAME, msg.params[0]);
+        return;
+    }
+    
 
     // Check if nickname is already in use
     for (std::map<int, Client*>::iterator it = _clients.begin();
