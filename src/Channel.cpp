@@ -90,6 +90,11 @@ void Channel::setKey(const std::string &key)
     _key = key;
 }
 
+const std::string& Channel::getKey() const
+{
+    return _key;
+}
+
 void Channel::removeKey()
 {
     _key.clear();

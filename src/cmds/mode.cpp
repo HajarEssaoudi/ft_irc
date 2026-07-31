@@ -2,6 +2,13 @@
 
 void Server::modeCommand(Client *client, const Message &msg)
 {
+    // Check inf if client is auth before running join
+    if (!client->isAuthenticated())
+    {
+        raiseError(client->fd, ERR_NOTREGISTERED, "");
+        return;
+    }
+
     // Check parameters
      if (msg.params.empty())
     {
@@ -100,7 +107,8 @@ void Server::modeCommand(Client *client, const Message &msg)
         }
         std::string key = msg.params[2];
         channel->setKey(key);
-
+        std::cout << "Stored key = [" << key << "]" << std::endl;
+        std::cout << "hasKey = " << channel->hasKey() << std::endl;
         std::string reply = ":" + client->getPrefix() + " MODE " + channelName + " +k";
         channel->broadcast(reply);
 

@@ -2,6 +2,13 @@
 
 void Server::topicCommand(Client *client, const Message &msg)
 {
+    // Check inf if client is auth before running join
+    if (!client->isAuthenticated())
+    {
+        raiseError(client->fd, ERR_NOTREGISTERED, "");
+        return;
+    }
+
     // Check parameters
     if (msg.params.empty())
     {

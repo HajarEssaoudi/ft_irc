@@ -2,6 +2,13 @@
 
 void Server::joinCommand(Client *client, const Message &msg)
 {
+    // Check inf if client is auth before running join
+    if (!client->isAuthenticated())
+    {
+        raiseError(client->fd, ERR_NOTREGISTERED, "");
+        return;
+    }
+
     // Validate parameters
     if (msg.params.empty())
     {
@@ -12,7 +19,7 @@ void Server::joinCommand(Client *client, const Message &msg)
     std::string channelName = msg.params[0];
 
     // Validate the channel name
-    if (channelName.empty() || channelName[0] != '#')
+    if (channelName.empty() || channelName[0] != '#' || channelName.find(',') != std::string::npos)
     {
         raiseError(client->fd, ERR_NOSUCHCHANNEL, channelName);
         return;

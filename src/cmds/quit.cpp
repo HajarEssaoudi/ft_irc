@@ -2,8 +2,14 @@
 
 void Server::quitCommand(Client *client, const Message &msg)
 {
-    std::string reason = msg.trailing;
+    // Check inf if client is auth before running join
+    if (!client->isAuthenticated())
+    {
+        raiseError(client->fd, ERR_NOTREGISTERED, "");
+        return;
+    }
 
+    std::string reason = msg.trailing;
     if (reason.empty())
         reason = "Client Quit";
 
