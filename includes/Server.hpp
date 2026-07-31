@@ -13,7 +13,8 @@
 #include <stdexcept>
 #include <cstdlib>
 #include <signal.h>
-#include <sstream> 
+#include <sstream>
+#include <cstdlib>
 #include "Client.hpp"
 #include "Channel.hpp"
 #include "utils.hpp"
@@ -68,6 +69,8 @@ class Server
         void raiseError(int fd, int code, const std::string &arg);
         void raiseReply(int fd, int code, const std::string &arg1, const std::string &arg2 = "");
         void execCmd(Client *client , Message &msg);
+        //bonus
+        void execBot(Client *client, const std::string &message);
 
     private:
         void setUpSocket();

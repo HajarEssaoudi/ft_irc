@@ -1,5 +1,32 @@
 #include "../../includes/Server.hpp"
 
+void Server::execBot(Client *client, const std::string &message)
+{
+    static const char *jokes[] =
+    {
+        "Why do programmers prefer dark mode? Because light attracts bugs.",
+        "There are only 10 kinds of people: those who understand binary and those who don't.",
+        "A SQL query walks into a bar and asks: Can I join you?",
+        "Debugging is like being the detective in a crime movie where you're also the murderer.",
+        "Why did the programmer quit his job? Because he didn't get arrays."
+    };
+
+    std::string reply;
+
+    if (message == "help")
+        reply = "Commands: joke, help";
+    else if (message == "joke")
+        reply = jokes[rand() % 5];
+    else
+        reply = "Unknown command. Try 'joke' or 'help'.";
+
+    client->sendMessage(
+        ":JokeBot!bot@localhost PRIVMSG " +
+        client->nickname +
+        " :" +
+        reply);
+}
+
 void Server::privmsgCommand(Client *client, const Message &msg)
 {
     if (!client->authenticated)
@@ -51,6 +78,12 @@ void Server::privmsgCommand(Client *client, const Message &msg)
         }
 
         return;
+    }
+    /*BONUS => BOT*/
+    if (target == "JokeBot")
+    {
+        execBot(client, msg.trailing);
+            return;
     }
 //-------------------------------------------------------------------
     std::cout << "\n===== Connected clients =====" << std::endl;
