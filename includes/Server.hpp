@@ -32,7 +32,6 @@ class Server
         std::map<std::string, Channel*> _channels;
 
     public:
-        static Server* instance;
         static void signalHandler(int signal);
 
         Server(int port, const std::string &password);

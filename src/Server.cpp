@@ -1,6 +1,5 @@
 #include "../includes/Server.hpp"
 
-Server *Server::instance = NULL;
 
 Server::Server(int port , const std::string &password): _port(port), _password(password), _server_fd(-1){}
 
@@ -118,7 +117,6 @@ void Server::accepterNewClient()
 
 void Server::start()
 {
-    instance = this;
     signal(SIGINT, signalHandler);
     signal(SIGQUIT, signalHandler);
     setUpSocket();
