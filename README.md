@@ -140,9 +140,9 @@ ft_irc/
 
 | Member | Responsibility |
 |--------|---------------|
-| Zainab Errossafi | Network layer: socket, poll(), recv(), Client class |
-| [Coéquipière 2] | Parser, authentication (PASS, NICK, USER), channels |
-| [Coéquipière 3] | Commands (PRIVMSG, KICK, MODE, INVITE, TOPIC), bot |
+| zerrossa | Network layer: socket, poll(), recv(), Client class |
+| hes-saou | Parser, authentication (PASS, NICK, USER), bot|
+| lalfidi  | channels , Commands (PRIVMSG, KICK, MODE, INVITE, TOPIC..)|
 
 ---
 
