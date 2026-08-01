@@ -1,4 +1,4 @@
-#include "../../includes/Server.hpp"
+#include "../includes/Server.hpp"
 
 void Server::execBot(Client *client, const std::string &message)
 {
@@ -22,9 +22,7 @@ void Server::execBot(Client *client, const std::string &message)
 
     client->sendMessage(
         ":JokeBot!bot@localhost PRIVMSG " +
-        client->nickname +
-        " :" +
-        reply);
+        client->nickname + " :" + reply);
 }
 
 void Server::privmsgCommand(Client *client, const Message &msg)
@@ -34,13 +32,11 @@ void Server::privmsgCommand(Client *client, const Message &msg)
         raiseError(client->fd, ERR_NOTREGISTERED, "");
         return;
     }
-
     if (msg.params.empty())
     {
         raiseError(client->fd, ERR_NORECIPIENT, msg.command);
         return;
     }
-
     if (msg.trailing.empty())
     {
         raiseError(client->fd, ERR_NOTEXTTOSEND, "");
@@ -52,63 +48,50 @@ void Server::privmsgCommand(Client *client, const Message &msg)
     if (target[0] == '#')
     {
         Channel *channel = getChannel(target);
-
         if (!channel)
         {
             raiseError(client->fd, ERR_NOSUCHNICK, target);
             return;
         }
-
         if (!channel->hasMember(client))
         {
             raiseError(client->fd, ERR_NOTONCHANNEL, target);
             return;
         }
-
-        std::string reply = ":" + client->getPrefix() + " PRIVMSG " + target + " :" + msg.trailing;
-
+        std::string reply = ":" + client->getPrefix() +
+                           " PRIVMSG " + target + " :" + msg.trailing;
         const std::set<Client *> &members = channel->getMembers();
-
         for (std::set<Client *>::const_iterator it = members.begin();
-             it != members.end();
-             ++it)
+             it != members.end(); ++it)
         {
             if (*it != client)
                 (*it)->sendMessage(reply);
         }
-
         return;
     }
-    /*BONUS => BOT*/
+
     if (target == "JokeBot")
     {
         execBot(client, msg.trailing);
-            return;
+        return;
     }
 
     Client *receiver = getClientByNick(target);
-
     if (!receiver)
     {
-        std::cout << "Receiver NOT FOUND" << std::endl;
         raiseError(client->fd, ERR_NOSUCHNICK, target);
         return;
     }
 
-    std::cout << "Receiver FOUND: " << receiver->nickname
-              << " fd=" << receiver->fd << std::endl;
-
-    /*Handle DCC: FILE TRANSFER => BONUS*/
     std::string text = msg.trailing;
-
-    if (!text.empty() && text[0] == '\001' && text.find("DCC ") != std::string::npos)
+    if (!text.empty() && text[0] == '\001' &&
+        text.find("DCC ") != std::string::npos)
     {
         std::cout << "DCC request detected" << std::endl;
     }
 
-    std::string reply = ":" + client->getPrefix() + " PRIVMSG " + receiver->nickname + " :" + msg.trailing;
-
-    std::cout << "Sending: [" << reply << "]" << std::endl;
-
+    std::string reply = ":" + client->getPrefix() +
+                       " PRIVMSG " + receiver->nickname +
+                       " :" + msg.trailing;
     receiver->sendMessage(reply);
 }
