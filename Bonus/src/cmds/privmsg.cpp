@@ -85,20 +85,7 @@ void Server::privmsgCommand(Client *client, const Message &msg)
         execBot(client, msg.trailing);
             return;
     }
-//-------------------------------------------------------------------
-    std::cout << "\n===== Connected clients =====" << std::endl;
 
-    for (std::map<int, Client*>::iterator it = _clients.begin();
-        it != _clients.end(); ++it)
-    {
-        std::cout << "fd=" << it->first
-                << " nick=[" << it->second->nickname << "]"
-                << " authenticated=" << it->second->authenticated
-                << std::endl;
-    }
-
-    std::cout << "Searching for [" << target << "]" << std::endl;
-//-------------------------------------------------------------------
     Client *receiver = getClientByNick(target);
 
     if (!receiver)
